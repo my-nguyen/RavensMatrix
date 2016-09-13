@@ -44,7 +44,7 @@ public class Agent {
         System.out.println(problem);
 
         // if Figure A to Figure B is UNCHANGED
-        List<MyFigure> designs = problem.designs.list;
+        List<MyFigure> designs = problem.patterns.list;
         if (designs.get(0).isUnchanged(designs.get(1))) {
             System.out.println(designs.get(2));
             // look in answer choices for a Figure that matches Figure C
