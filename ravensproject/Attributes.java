@@ -11,9 +11,6 @@ public class Attributes {
 
    Attributes(Map<String, String> rhs) {
       map = new HashMap<>();
-      for (Map.Entry<String, String> entry : rhs.entrySet()) {
-         map.put(entry.getKey(), entry.getValue());
-      }
    }
 
    boolean isUnchanged(Map<String, String> rhs) {

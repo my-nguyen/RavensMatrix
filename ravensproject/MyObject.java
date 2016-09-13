@@ -5,18 +5,17 @@ package ravensproject;
  */
 public class MyObject {
    String name;
-   Attributes attributes;
+   DynamicAttributes dynamicAttributes;
+   StaticAttributes staticAttributes;
 
    MyObject(RavensObject object) {
       name = object.getName();
-      attributes = new Attributes(object.getAttributes());
+      dynamicAttributes = new DynamicAttributes(object.getAttributes());
+      staticAttributes = new StaticAttributes(object.getAttributes());
    }
 
    boolean isUnchanged(MyObject rhs) {
-      boolean unchanged = attributes.isUnchanged(rhs.attributes.map);
-      if (unchanged) {
-         // System.out.println(toString(leftObject));
-         // System.out.println(toString(rhs));
+      if (staticAttributes.isUnchanged(rhs.staticAttributes.map)) {
          System.out.println("Object " + name + " to Object " + rhs.name + " is UNCHANGED.");
          return true;
       } else {
@@ -28,7 +27,9 @@ public class MyObject {
    public String toString() {
       StringBuilder builder = new StringBuilder();
       builder.append("Object: " + name);
-      builder.append(attributes);
+      builder.append(staticAttributes);
+      builder.append(dynamicAttributes);
+      builder.append("\n");
       return builder.toString();
    }
 }

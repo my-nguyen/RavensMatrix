@@ -27,6 +27,7 @@ public class Choices {
 
    int find(MyFigure figure) {
       for (int i = 0; i < list.size(); i++) {
+         System.out.print(list.get(i));
          if (figure.isUnchanged(list.get(i))) {
             return i;
          }

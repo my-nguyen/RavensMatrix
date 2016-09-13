@@ -22,6 +22,7 @@ public class MyFigure {
    }
 
    boolean isUnchanged(MyFigure rhs) {
+      // make sure the 2 Figures contain the same number of Objects
       if (objects.size() != rhs.objects.size()) {
          return false;
       }
@@ -29,9 +30,14 @@ public class MyFigure {
          if (!Utils.containsObject(rhs.objects.values(), object)) {
             return false;
          }
+         /*
+         for (MyObject iterator : rhs.objects.values()) {
+            if (object.isUnchanged(iterator)) {
+               return true;
+            }
+         }
+         */
       }
-      // System.out.println(toString(leftFigure));
-      // System.out.println(toString(rhs));
       System.out.println("Figure " + name + " to Figure " + rhs.name + " is UNCHANGED.");
       return true;
    }

@@ -44,16 +44,18 @@ public class Agent {
         System.out.println(problem);
 
         // if Figure A to Figure B is UNCHANGED
-        List<MyFigure> designs = problem.patterns.list;
-        if (designs.get(0).isUnchanged(designs.get(1))) {
-            System.out.println(designs.get(2));
+        List<MyFigure> patterns = problem.patterns.list;
+        System.out.print(patterns.get(0));
+        System.out.print(patterns.get(1));
+        if (patterns.get(0).isUnchanged(patterns.get(1))) {
+            System.out.print(patterns.get(2));
             // look in answer choices for a Figure that matches Figure C
-            int index = problem.choices.find(designs.get(2));
+            int index = problem.choices.find(patterns.get(2));
             if (index != -1) {
                 // if Figure A to Figure C is UNCHANGED
-                if (designs.get(0).isUnchanged(designs.get(2))) {
+                if (patterns.get(0).isUnchanged(patterns.get(2))) {
                     // make sure Figure B to answer choice is also UNCHANGED
-                    if (designs.get(1).isUnchanged(problem.choices.list.get(index))) {
+                    if (patterns.get(1).isUnchanged(problem.choices.list.get(index))) {
                         System.out.println("answer " + (index + 1));
                         return index;
                     } else {
