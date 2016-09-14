@@ -1,6 +1,7 @@
 package ravensproject;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Your Agent for solving Raven's Progressive Matrices. You MUST modify this
@@ -47,6 +48,12 @@ public class Agent {
         List<MyFigure> patterns = problem.patterns.list;
         System.out.print(patterns.get(0));
         System.out.print(patterns.get(1));
+        MyFigure figureA = patterns.get(0);
+        MyFigure figureB = patterns.get(1);
+        Map<String, Attributes> horizontalDiff;
+        Map<String, Attributes> verticalDiff;
+        return -1;
+        /*
         if (patterns.get(0).isUnchanged(patterns.get(1))) {
             System.out.print(patterns.get(2));
             // look in answer choices for a Figure that matches Figure C
@@ -71,5 +78,6 @@ public class Agent {
             System.out.println("no identical figures");
             return -1;
         }
+        */
     }
 }
