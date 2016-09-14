@@ -11,6 +11,10 @@ public class Attributes {
 
    Attributes(Map<String, String> rhs) {
       map = new HashMap<>();
+      // copy the whole contents of the rhs map over to member map
+      for (Map.Entry<String, String> entry : rhs.entrySet()) {
+         map.put(entry.getKey(), entry.getValue());
+      }
    }
 
    boolean isUnchanged(Map<String, String> rhs) {
@@ -21,8 +25,11 @@ public class Attributes {
       // for each key in this map, make sure the value for that key in this map matches the value
       // for the same key in the other map
       for (String key : map.keySet()) {
-         if (!map.get(key).equals(rhs.get(key))) {
-            return false;
+         // skip comparing the "inside" attribute
+         if (!key.equals("inside")) {
+            if (!map.get(key).equals(rhs.get(key))) {
+               return false;
+            }
          }
       }
       return true;

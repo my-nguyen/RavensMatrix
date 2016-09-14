@@ -9,7 +9,7 @@ import java.util.Map;
 public class MyFigure {
    String name;
    Map<String, MyObject> objects;
-   String visualFilename;
+   // String visualFilename;
 
    MyFigure(RavensFigure figure) {
       name = figure.getName();
@@ -18,7 +18,10 @@ public class MyFigure {
          MyObject object = new MyObject(entry.getValue());
          objects.put(entry.getKey(), object);
       }
-      visualFilename = figure.getVisual();
+      for (Map.Entry<String, MyObject> entry : objects.entrySet()) {
+         entry.getValue().initInsides(objects);
+      }
+      // visualFilename = figure.getVisual();
    }
 
    boolean isUnchanged(MyFigure rhs) {
@@ -27,6 +30,7 @@ public class MyFigure {
          return false;
       }
       for (MyObject object : objects.values()) {
+         // make sure all Objects in this Figure match those in some other Figure
          if (!Utils.containsObject(rhs.objects.values(), object)) {
             return false;
          }
