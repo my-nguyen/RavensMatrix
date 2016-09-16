@@ -1,7 +1,6 @@
 package ravensproject;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Your Agent for solving Raven's Progressive Matrices. You MUST modify this
@@ -46,16 +45,31 @@ public class Agent {
 
         // if Figure A to Figure B is UNCHANGED
         List<MyFigure> patterns = problem.patterns.list;
-        System.out.print(patterns.get(0));
-        System.out.print(patterns.get(1));
         MyFigure figureA = patterns.get(0);
         MyFigure figureB = patterns.get(1);
-        Map<String, Attributes> horizontalDiff;
-        Map<String, Attributes> verticalDiff;
-        return -1;
+        MyFigure figureC = patterns.get(2);
+        System.out.println(figureA);
+        System.out.println(figureB);
+        System.out.println(figureC);
+        MyFigure horizontalDiff = figureB.subtract(figureA);
+        System.out.println("B-A:" + horizontalDiff);
+        MyFigure horizontalTarget = figureC.add(horizontalDiff);
+        System.out.println("C+B-A:" + horizontalTarget);
+        int horizontalChoice = problem.choices.find(horizontalTarget);
+        MyFigure verticalDiff = figureC.subtract(figureA);
+        System.out.println("C-A:" + verticalDiff);
+        MyFigure verticalTarget = figureB.add(verticalDiff);
+        System.out.println("B+C-A:" + verticalTarget);
+        int verticalChoice = problem.choices.find(verticalTarget);
+        if (horizontalChoice == verticalChoice) {
+            System.out.println("Answer: " + (horizontalChoice+1) + ": " + verticalTarget);
+            return horizontalChoice;
+        } else {
+            return -1;
+        }
         /*
         if (patterns.get(0).isUnchanged(patterns.get(1))) {
-            System.out.print(patterns.get(2));
+            System.out.println(patterns.get(2));
             // look in answer choices for a Figure that matches Figure C
             int index = problem.choices.find(patterns.get(2));
             if (index != -1) {

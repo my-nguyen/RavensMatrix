@@ -70,4 +70,15 @@ public class RavensFigure {
     public String getVisual() {
         return visualFilename;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Figure<name:").append(name).append(", ");
+        for (HashMap.Entry<String,RavensObject> entry : objects.entrySet()) {
+            builder.append(entry.getValue()).append(", ");
+        }
+        builder.append(">");
+        return builder.toString();
+    }
 }
