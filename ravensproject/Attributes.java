@@ -70,7 +70,17 @@ public class Attributes {
                try {
                   int left = Integer.parseInt(entry.getValue());
                   int right = Integer.parseInt(rhs.map.get(key));
-                  value = Integer.toString(left + right);
+                  int sum;
+                  if (map.containsValue("pac-man")) {
+                     if (left >= 270 && left < 360) {
+                        sum = left - 90;
+                     } else {
+                        sum = left + 90;
+                     }
+                  } else {
+                     sum = left + right;
+                  }
+                  value = Integer.toString(sum);
                } catch(NumberFormatException e) {
                   value = "0";
                }
