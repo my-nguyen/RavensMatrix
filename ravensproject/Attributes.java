@@ -30,22 +30,22 @@ public class Attributes {
             ;
          } else {
             String value;
-            if (entry.getValue().equals(rhs.map.get(key))) {
-               // if the left and right attributes are the same, save it
-               value = entry.getValue();
-            } else if (key.equals("shape") || key.equals("size") || key.equals("fill")) {
-               // if the attribute is shape, or size, or fill, save the rhs value
-               value = rhs.map.get(key);
-            } else if (key.equals("angle")) {
+            if (key.equals("angle")) {
                // if the attribute is angle, calculate the difference and save it
                try {
                   int left = Integer.parseInt(entry.getValue());
                   int right = Integer.parseInt(rhs.map.get(key));
                   value = Integer.toString(left - right);
                   System.out.println("left: " + left + ", right: " + right + ", subtract: " + value);
-               } catch(NumberFormatException e) {
+               } catch (NumberFormatException e) {
                   value = "0";
                }
+            } else if (entry.getValue().equals(rhs.map.get(key))) {
+               // if the left and right attributes are the same, save it
+               value = entry.getValue();
+            } else if (key.equals("shape") || key.equals("size") || key.equals("fill")) {
+               // if the attribute is shape, or size, or fill, save the rhs value
+               value = rhs.map.get(key);
             } else if (key.equals("alignment")) {
                // what to do????
                value = "";
@@ -55,7 +55,6 @@ public class Attributes {
             attributes.map.put(key, value);
          }
       }
-      System.out.println("Diff " + attributes);
       return attributes;
    }
 
