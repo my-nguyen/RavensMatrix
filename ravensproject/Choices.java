@@ -18,7 +18,6 @@ public class Choices {
       list.add(new MyFigure(map.get("3")));
       list.add(new MyFigure(map.get("4")));
       list.add(new MyFigure(map.get("5")));
-      System.out.println("Just added " + list.get(4));
       list.add(new MyFigure(map.get("6")));
       if (problemType.equals("3x3")) {
          list.add(new MyFigure(map.get("7")));
@@ -27,11 +26,11 @@ public class Choices {
    }
 
    int find(MyFigure target) {
-      System.out.println("Choices size: " + list.size());
+      // System.out.println("Choices size: " + list.size());
       for (int i = 0; i < list.size(); i++) {
-         System.out.println("Item " + i + " " + list.get(i));
+         // System.out.println("Item " + i + " " + list.get(i));
          if (target.isIdentical(list.get(i))) {
-            System.out.println("Found at " + i + " " + list.get(i));
+            System.out.println("CHOICE " + i + ": " + list.get(i));
             return i;
          }
       }

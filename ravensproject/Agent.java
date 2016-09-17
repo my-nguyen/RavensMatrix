@@ -53,49 +53,21 @@ public class Agent {
         System.out.println(figureC);
 
         MyFigure horizontalDiff = figureB.subtract(figureA);
-        System.out.println("B-A:" + horizontalDiff);
+        System.out.println("A -> B:" + horizontalDiff);
         MyFigure horizontalTarget = figureC.add(horizontalDiff);
-        System.out.println("C+B-A:" + horizontalTarget);
+        System.out.println("C -> TARGET:" + horizontalTarget);
         int horizontalChoice = problem.choices.find(horizontalTarget);
-        System.out.println("Horizontal choice: " + horizontalChoice);
 
         MyFigure verticalDiff = figureC.subtract(figureA);
-        System.out.println("C-A:" + verticalDiff);
+        System.out.println("A -> C:" + verticalDiff);
         MyFigure verticalTarget = figureB.add(verticalDiff);
-        System.out.println("B+C-A:" + verticalTarget);
+        System.out.println("B -> TARGET:" + verticalTarget);
         int verticalChoice = problem.choices.find(verticalTarget);
-        System.out.println("Vertical choice: " + verticalChoice);
         if (horizontalChoice == verticalChoice) {
             System.out.println("Answer: " + (horizontalChoice+1) + ": " + verticalTarget);
             return horizontalChoice;
         } else {
             return -1;
         }
-        /*
-        if (patterns.get(0).isUnchanged(patterns.get(1))) {
-            System.out.println(patterns.get(2));
-            // look in answer choices for a Figure that matches Figure C
-            int index = problem.choices.find(patterns.get(2));
-            if (index != -1) {
-                // if Figure A to Figure C is UNCHANGED
-                if (patterns.get(0).isUnchanged(patterns.get(2))) {
-                    // make sure Figure B to answer choice is also UNCHANGED
-                    if (patterns.get(1).isUnchanged(problem.choices.list.get(index))) {
-                        System.out.println("answer " + (index + 1));
-                        return index;
-                    } else {
-                        return -1;
-                    }
-                } else {
-                    return -1;
-                }
-            } else {
-                return -1;
-            }
-        } else {
-            System.out.println("no identical figures");
-            return -1;
-        }
-        */
     }
 }

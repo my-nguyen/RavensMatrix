@@ -1,7 +1,13 @@
 package ravensproject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by My on 9/13/2016.
@@ -36,19 +42,25 @@ public class Attributes {
                   int left = Integer.parseInt(entry.getValue());
                   int right = Integer.parseInt(rhs.map.get(key));
                   value = Integer.toString(left - right);
-                  System.out.println("left: " + left + ", right: " + right + ", subtract: " + value);
                } catch (NumberFormatException e) {
                   value = "0";
                }
+            } else if (key.equals("shape")) {
+               String left = entry.getValue();
+               String right = rhs.map.get("shape");
+               if (left.equals(right)) {
+                  value = "unchanged";
+               } else {
+                  value = "changed:" + left;
+               }
+            } else if (key.equals("size") || key.equals("fill")) {
+               value = entry.getValue();
+            } else if (key.equals("alignment")) {
+               // save the left and right alignment attributes and pass them on for method add() later
+               value = entry.getValue() + ";" + rhs.map.get("alignment");
             } else if (entry.getValue().equals(rhs.map.get(key))) {
                // if the left and right attributes are the same, save it
                value = entry.getValue();
-            } else if (key.equals("shape") || key.equals("size") || key.equals("fill")) {
-               // if the attribute is shape, or size, or fill, save the rhs value
-               value = rhs.map.get(key);
-            } else if (key.equals("alignment")) {
-               // what to do????
-               value = "";
             } else {
                value = "";
             }
@@ -65,25 +77,76 @@ public class Attributes {
          if (!rhs.map.containsKey(key) || key.equals("inside")) {
             ;
          } else {
-            String value = entry.getValue();
+            String value = "";
             if (key.equals("angle")) {
-               try {
-                  int left = Integer.parseInt(entry.getValue());
-                  int right = Integer.parseInt(rhs.map.get(key));
-                  int sum;
-                  if (map.containsValue("pac-man")) {
-                     if (left >= 270 && left < 360) {
-                        sum = left - 90;
-                     } else {
-                        sum = left + 90;
-                     }
+               int left = Integer.parseInt(entry.getValue());
+               int right = Integer.parseInt(rhs.map.get(key));
+               int sum;
+               if (map.containsValue("pac-man")) {
+                  if (left >= 270 && left < 360) {
+                     sum = left - 90;
                   } else {
-                     sum = left + right;
+                     sum = left + 90;
                   }
-                  value = Integer.toString(sum);
-               } catch(NumberFormatException e) {
-                  value = "0";
+               } else {
+                  sum = left + right;
                }
+               value = Integer.toString(sum);
+            } else if (key.equals("alignment")) {
+               // retrieve the alignment attribute "bottom-right;bottom-left" stored by subtract()
+               String addAlignment = rhs.map.get("alignment");
+               // split to break the value into 2 alignment attributes: "bottom-right" and "bottom-left"
+               String[] splits = addAlignment.split(";");
+               // save these 2 alignment attributes plus the current alignment attribute:
+               // "bottom-right", "bottom-left", and "top-right"
+               List<String> allAlignments = new ArrayList<>();
+               for (String split : splits) {
+                  allAlignments.add(split);
+               }
+               allAlignments.add(entry.getValue());
+
+               // break the 3 alignment attributes ("bottom-right", "bottom-left" and "top-right")
+               // into 4 labels ("bottom", "top", "right", "left")
+               Set<String> left = new HashSet<>();
+               Set<String> right = new HashSet<>();
+               for (String alignment : allAlignments) {
+                  String[] labels = alignment.split("-");
+                  left.add(labels[0]);
+                  right.add(labels[1]);
+               }
+
+               // make up 4 possible attributes out of those 4 labels: "bottom-right", "bottom-left",
+               // "top-right", "top-left"
+               Map<String, Boolean> map = new HashMap<>();
+               for (String leftLabel : left) {
+                  for (String rightLabel : right) {
+                     String newLabel = leftLabel + "-" + rightLabel;
+                     map.put(newLabel, true);
+                  }
+               }
+
+               // mark the 3 existing attributes "bottom-right", "bottom-left" and "top-right"
+               for (String alignment : allAlignments) {
+                  map.put(alignment, false);
+               }
+               // look for the 1 missing attribute, which should be "top-left"
+               for (Map.Entry<String, Boolean> entree : map.entrySet()) {
+                  if (entree.getValue()) {
+                     value = entree.getKey();
+                     break;
+                  }
+               }
+            } else if (key.equals("shape")) {
+               if (rhs.map.get("shape").equals("unchanged")) {
+                  value = entry.getValue();
+               } else {
+                  String[] tokens = rhs.map.get("shape").split(":");
+                  value = tokens[1];
+               }
+            } else if (key.equals("fill")) {
+               value = entry.getValue();
+            } else if (key.equals("size")) {
+               value = entry.getValue();
             }
             attributes.map.put(key, value);
          }
