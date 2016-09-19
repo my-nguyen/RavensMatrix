@@ -53,8 +53,16 @@ public class Attributes {
                } else {
                   value = "changed:" + left;
                }
-            } else if (key.equals("size") || key.equals("fill")) {
+            } else if (key.equals("size")) {
                value = entry.getValue();
+            } else if (key.equals("fill")) {
+               String left = entry.getValue();
+               String right = rhs.map.get("fill");
+               if (left.equals(right)) {
+                  value = "unchanged";
+               } else {
+                  value = left;
+               }
             } else if (key.equals("alignment")) {
                // save the left and right alignment attributes and pass them on for method add() later
                value = entry.getValue() + ";" + rhs.map.get("alignment");
@@ -144,7 +152,11 @@ public class Attributes {
                   value = tokens[1];
                }
             } else if (key.equals("fill")) {
-               value = entry.getValue();
+               if (rhs.map.get("fill").equals("unchanged")) {
+                  value = entry.getValue();
+               } else {
+                  value = rhs.map.get("fill");
+               }
             } else if (key.equals("size")) {
                value = entry.getValue();
             }
@@ -155,12 +167,14 @@ public class Attributes {
    }
 
    boolean isIdentical(Attributes rhs) {
-      // make sure the two maps of attributes are of the same size
       // for each key in this map, make sure the value for that key in this map matches the value
       // for the same key in the other map
       for (String key : map.keySet()) {
-         // skip comparing the "inside" attribute
-         if (!key.equals("inside")) {
+         if (key.equals("inside")) {
+            // skip comparing the "inside" attribute
+         } else if (key.equals("above")) {
+            // skip comparing the "above" attribute
+         } else {
             if (!map.get(key).equals(rhs.map.get(key))) {
                return false;
             }

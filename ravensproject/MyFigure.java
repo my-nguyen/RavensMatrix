@@ -19,19 +19,61 @@ public class MyFigure {
    MyFigure(RavensFigure figure) {
       name = figure.getName();
 
-      // System.out.println("Figure " + name + ", " + figure.getObjects().size() + " Objects");
-      // transfer the Map<String, RavensObject> from RavensFigure to a temporary Map<Integer, MyObject>
-      // based on the "inside" attribute
-      Map<Integer, MyObject> indices = new HashMap<>();
-      for (Map.Entry<String, RavensObject> entry : figure.getObjects().entrySet()) {
-         MyObject value = new MyObject(entry.getValue());
-         int index = value.index();
-         indices.put(index, value);
+      // construct a temporary List<MyObject> based on the RavensFigure.HashMap<String, RavensObject>
+      List<MyObject> tmp = new ArrayList<>();
+      for (RavensObject value : figure.getObjects().values()) {
+         MyObject object = new MyObject(value);
+         tmp.add(object);
       }
-      // set up
-      objects = new ArrayList<>();
-      for (int i = 0; i < indices.size(); i++) {
-         objects.add(indices.get(i));
+
+      boolean containsInside = false;
+      for (RavensObject value : figure.getObjects().values()) {
+         // check if any RavensObject contains the attribute "inside"
+         if (value.getAttributes().containsKey("inside")) {
+            containsInside = true;
+            break;
+         }
+      }
+
+      // System.out.println("contains inside? " + containsInside);
+      Map<Integer, MyObject> indices = new HashMap<>();
+      if (containsInside) {
+         // if the attribute "inside" exists, then for each MyObject in the temporary list,
+         // calculate the MyObject index and pair the index with that MyObject to store in a
+         // temporary map
+         for (MyObject object : tmp) {
+            int index = object.index();
+            indices.put(index, object);
+         }
+         // insert the MyObjects from the temporary map into objects based on the calculated indices
+         objects = new ArrayList<>();
+         for (int i = 0; i < indices.size(); i++) {
+            objects.add(indices.get(i));
+            System.out.println("added at " + i + " object: " + indices.get(i));
+         }
+      } else {
+         // check if any RavensObject contains the attribute "above"
+         RavensObject aboveObject = null;
+         for (RavensObject value : figure.getObjects().values()) {
+            if (value.getAttributes().containsKey("above")) {
+               aboveObject = value;
+               break;
+            }
+         }
+
+         if (aboveObject != null) {
+            String belowName = aboveObject.getAttributes().get("above");
+            RavensObject belowObject = figure.getObjects().get(belowName);
+            MyObject above = new MyObject(aboveObject);
+            MyObject below = new MyObject(belowObject);
+            above.above = below;
+            objects = new ArrayList<>();
+            objects.add(above);
+            objects.add(below);
+         } else {
+            // copy the temporary list created earlier
+            objects = tmp;
+         }
       }
    }
 
@@ -47,8 +89,6 @@ public class MyFigure {
    }
 
    MyFigure add(MyFigure rhs) {
-      // System.out.print("LEFT: " + this);
-      // System.out.print("RIGHT: " + rhs);
       MyFigure figure = new MyFigure();
       figure.name = "Add";
       figure.objects = new ArrayList<>();

@@ -6,6 +6,7 @@ package ravensproject;
 public class MyObject {
    String name;
    Attributes attributes;
+   MyObject above;
 
    MyObject(RavensObject object) {
       name = object.getName();
@@ -42,7 +43,6 @@ public class MyObject {
       StringBuilder builder = new StringBuilder();
       builder.append("Object<name:" + name + ", ");
       builder.append(attributes);
-      // builder.append(dynamicAttributes);
       builder.append(">");
       return builder.toString();
    }
