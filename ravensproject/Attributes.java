@@ -38,12 +38,12 @@ public class Attributes {
             String value;
             if (key.equals("angle")) {
                // if the attribute is angle, calculate the difference and save it
-               try {
-                  int left = Integer.parseInt(entry.getValue());
-                  int right = Integer.parseInt(rhs.map.get(key));
+               int left = Integer.parseInt(entry.getValue());
+               int right = Integer.parseInt(rhs.map.get(key));
+               if (left == right) {
+                  value = "unchanged";
+               } else {
                   value = Integer.toString(left - right);
-               } catch (NumberFormatException e) {
-                  value = "0";
                }
             } else if (key.equals("shape")) {
                String left = entry.getValue();
@@ -51,10 +51,16 @@ public class Attributes {
                if (left.equals(right)) {
                   value = "unchanged";
                } else {
-                  value = "changed:" + left;
+                  value = left;
                }
             } else if (key.equals("size")) {
-               value = entry.getValue();
+               String left = entry.getValue();
+               String right = rhs.map.get("size");
+               if (left.equals(right)) {
+                  value = "unchanged";
+               } else {
+                  value = left;
+               }
             } else if (key.equals("fill")) {
                String left = entry.getValue();
                String right = rhs.map.get("fill");
@@ -87,19 +93,23 @@ public class Attributes {
          } else {
             String value = "";
             if (key.equals("angle")) {
-               int left = Integer.parseInt(entry.getValue());
-               int right = Integer.parseInt(rhs.map.get(key));
-               int sum;
-               if (map.containsValue("pac-man")) {
-                  if (left >= 270 && left < 360) {
-                     sum = left - 90;
-                  } else {
-                     sum = left + 90;
-                  }
+               if (rhs.map.get("angle").equals("unchanged")) {
+                  value = entry.getValue();
                } else {
-                  sum = left + right;
+                  int left = Integer.parseInt(entry.getValue());
+                  int right = Integer.parseInt(rhs.map.get(key));
+                  int sum;
+                  if (map.containsValue("pac-man")) {
+                     if (left >= 270 && left < 360) {
+                        sum = left - 90;
+                     } else {
+                        sum = left + 90;
+                     }
+                  } else {
+                     sum = left + right;
+                  }
+                  value = Integer.toString(sum);
                }
-               value = Integer.toString(sum);
             } else if (key.equals("alignment")) {
                // retrieve the alignment attribute "bottom-right;bottom-left" stored by subtract()
                String addAlignment = rhs.map.get("alignment");
@@ -148,8 +158,7 @@ public class Attributes {
                if (rhs.map.get("shape").equals("unchanged")) {
                   value = entry.getValue();
                } else {
-                  String[] tokens = rhs.map.get("shape").split(":");
-                  value = tokens[1];
+                  value = rhs.map.get("shape");
                }
             } else if (key.equals("fill")) {
                if (rhs.map.get("fill").equals("unchanged")) {
@@ -158,7 +167,11 @@ public class Attributes {
                   value = rhs.map.get("fill");
                }
             } else if (key.equals("size")) {
-               value = entry.getValue();
+               if (rhs.map.get("size").equals("unchanged")) {
+                  value = entry.getValue();
+               } else {
+                  value = rhs.map.get("size");
+               }
             }
             attributes.map.put(key, value);
          }

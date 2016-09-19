@@ -49,7 +49,6 @@ public class MyFigure {
          objects = new ArrayList<>();
          for (int i = 0; i < indices.size(); i++) {
             objects.add(indices.get(i));
-            System.out.println("added at " + i + " object: " + indices.get(i));
          }
       } else {
          // check if any RavensObject contains the attribute "above"
