@@ -7,11 +7,10 @@ public class MyObject {
    String name;
    Attributes attributes;
    MyObject above;
-   MyObject inside;
 
-   MyObject(MyObject object) {
-      name = object.name;
-      attributes = new Attributes(object.attributes);
+   MyObject(MyObject object, String name) {
+      this.name = name;
+      this.attributes = new Attributes(object.attributes);
    }
    MyObject(RavensObject object) {
       name = object.getName();
@@ -21,14 +20,6 @@ public class MyObject {
    MyObject(String name, Attributes attributes) {
       this.name = name;
       this.attributes = attributes;
-   }
-
-   MyObject subtract(MyObject rhs) {
-      return new MyObject("Subtract", attributes.subtract(rhs.attributes));
-   }
-
-   MyObject add(MyObject rhs) {
-      return new MyObject("Add", attributes.add(rhs.attributes));
    }
 
    MyObject generate(MyObject left, MyObject right) {
@@ -42,14 +33,19 @@ public class MyObject {
       return result;
    }
 
-   boolean isIdentical(MyObject rhs) {
-      return attributes.isIdentical(rhs.attributes);
+   // match() differs from equals() in that match() skips comparing the angle attribute
+   boolean match(MyObject rhs) {
+      return attributes.match(rhs.attributes);
    }
 
-   boolean match(MyObject target) {
-      boolean size = attributes.map.get("size").equals(target.attributes.map.get("size"));
-      boolean fill = attributes.map.get("fill").equals(target.attributes.map.get("fill"));
-      return size && fill;
+   @Override
+   public boolean equals(Object obj) {
+      return obj != null && attributes.equals(((MyObject)obj).attributes);
+   }
+
+   @Override
+   public int hashCode() {
+      return attributes.hashCode();
    }
 
    @Override

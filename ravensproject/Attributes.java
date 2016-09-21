@@ -19,6 +19,7 @@ public class Attributes {
    }
 
    Attributes(Attributes rhs) {
+      this();
       for (Map.Entry<String, String> entry : rhs.map.entrySet()) {
          map.put(entry.getKey(), entry.getValue());
       }
@@ -267,21 +268,35 @@ public class Attributes {
       return generatedAttributes;
    }
 
-   boolean isIdentical(Attributes rhs) {
-      // for each key in this map, make sure the value for that key in this map matches the value
-      // for the same key in the other map
-      for (String key : map.keySet()) {
-         if (key.equals("inside")) {
-            // skip comparing the "inside" attribute
-         } else if (key.equals("above")) {
-            // skip comparing the "above" attribute
-         } else {
-            if (!map.get(key).equals(rhs.map.get(key))) {
-               return false;
-            }
-         }
+   boolean match(Attributes rhs) {
+      boolean equalSize = map.get("size").equals(rhs.map.get("size"));
+      boolean equalShape = map.get("shape").equals(rhs.map.get("shape"));
+      boolean equalFill = map.get("fill").equals(rhs.map.get("fill"));
+      return equalSize && equalShape && equalFill;
+   }
+
+   @Override
+   public boolean equals(Object object) {
+      if (object == this)
+         return true;
+      if (!(object instanceof Attributes))
+         return false;
+
+      Attributes rhs = (Attributes)object;
+      boolean equalAngle = true;
+      if (map.containsKey("angle") && rhs.map.containsKey("angle")) {
+         equalAngle = map.get("angle").equals(rhs.map.get("angle"));
       }
-      return true;
+      return match(rhs) && equalAngle;
+   }
+
+   @Override
+   public int hashCode() {
+      int result = 17;
+      result = 31*result + map.get("size").hashCode();
+      result = 31*result + map.get("shape").hashCode();
+      result = 31*result + map.get("fill").hashCode();
+      return result;
    }
 
    @Override

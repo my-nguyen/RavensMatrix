@@ -3,6 +3,7 @@ package ravensproject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 /**
@@ -10,12 +11,7 @@ import java.util.Map;
  */
 public class MyFigure {
    String name;
-   // do I need a Map<String, MyObject> ????
-   // Map<String, MyObject> map;
    List<MyObject> objects;
-
-   MyFigure() {
-   }
 
    MyFigure(RavensFigure figure) {
       name = figure.getName();
@@ -78,114 +74,124 @@ public class MyFigure {
       }
    }
 
-   MyFigure subtract(MyFigure rhs) {
-      MyFigure figure = new MyFigure();
-      figure.name = "Subtract";
-      figure.objects = new ArrayList<>();
-      for (int i = 0; i < objects.size(); i++) {
-         MyObject object = objects.get(i).subtract(rhs.objects.get(i));
-         figure.objects.add(object);
-      }
-      return figure;
-   }
-
-   MyFigure(MyFigure rhs, String name) {
+   MyFigure(MyFigure rightFigure, String name) {
       this.name = name;
-      for (MyObject rightObject : rhs.objects) {
-         MyObject thisObject = new MyObject(rightObject);
+      this.objects = new ArrayList<>();
+      for (MyObject rightObject : rightFigure.objects) {
+         MyObject thisObject = new MyObject(rightObject, "generated");
          this.objects.add(thisObject);
       }
+      // need to generate "inside" attribute also
    }
 
-   MyFigure add(MyFigure rhs) {
-      MyFigure figure = new MyFigure();
-      figure.name = "Add";
-      figure.objects = new ArrayList<>();
-      if (objects.size() == rhs.objects.size()) {
-         for (int i = 0; i < objects.size(); i++) {
-            MyObject target = objects.get(i).add(rhs.objects.get(i));
-            figure.objects.add(target);
-         }
-      } else {
-         // assume rhs.objects.size() is smaller
-         for (int i = 0; i < rhs.objects.size(); i++) {
-            int index = find(this.objects, rhs.objects.get(i));
-            System.out.print("found at index: " + index);
-            figure.objects.add(objects.get(index));
-         }
-      }
-      return figure;
-   }
-
-   MyFigure generate(MyFigure left, MyFigure right) {
+   MyFigure generate(MyFigure leftFigure, MyFigure rightFigure) {
       MyFigure generatedFigure = new MyFigure(this, "generated");
-      generatedFigure.objects = new ArrayList<>();
+      // System.out.print("copied figure: " + generatedFigure);
 
-      int thisCount = this.objects.size();
-      int leftCount = left.objects.size();
-      int rightCount = right.objects.size();
-      System.out.println("this: " + thisCount + ", left: " + leftCount + ", right: " + rightCount);
-      if (thisCount == leftCount) {
-         if (thisCount == rightCount) {
-            for (int i = 0; i < objects.size(); i++) {
-               MyObject thisObject = this.objects.get(i);
-               MyObject leftObject = left.objects.get(i);
-               MyObject rightObject = right.objects.get(i);
-               MyObject generatedObject = thisObject.generate(leftObject, rightObject);
-               generatedFigure.objects.add(generatedObject);
-            }
-         } else {
-            System.out.println("this: " + thisCount + ", right: " + rightCount);
-         }
-      } else {
-         List<MyObject> matchedObjects = new ArrayList<>();
-         if (thisCount > leftCount) {
-            List<MyObject> tmpObjects = new ArrayList<>(this.objects);
-            for (int i = 0; i < leftCount; i++) {
-               MyObject leftObject = left.objects.get(i);
-               int index = find(tmpObjects, leftObject);
-               MyObject thisObject = tmpObjects.remove(index);
-               System.out.print(i + " matched object: " + thisObject);
-               matchedObjects.add(thisObject);
-            }
+      Map<MyObject, MyObject> generatedToLeft = transform(generatedFigure.objects, leftFigure.objects);
+      Map<MyObject, MyObject> leftToRight = transform(generatedToLeft, leftFigure.objects, rightFigure.objects);
+      // System.out.println("generatedToLeft size: " + generatedToLeft.size());
+      // System.out.println("leftToRight size: " + leftToRight.size());
 
-            for (int i = 0; i < matchedObjects.size(); i++) {
-               MyObject matchedObject = matchedObjects.get(i);
-               MyObject leftObject = left.objects.get(i);
-               MyObject rightObject = right.objects.get(i);
-               System.out.print("matched object: " + matchedObject);
-               System.out.print("left object: " + leftObject);
-               System.out.print("right object: " + rightObject);
-               MyObject generatedObject = matchedObject.generate(leftObject, rightObject);
-               System.out.print("generated object: " + generatedObject);
-               generatedFigure.objects.add(generatedObject);
+      // for (int i = 0; i < generatedFigure.objects.size(); i++) {
+      ListIterator iterator = generatedFigure.objects.listIterator();
+      while (iterator.hasNext()) {
+         MyObject generatedObject = (MyObject)iterator.next();
+         // System.out.print("generated: " + generatedObject);
+         MyObject leftObject = generatedToLeft.get(generatedObject);
+         // System.out.print("left: " + leftObject);
+         if (leftObject != null) {
+            MyObject rightObject = leftToRight.get(leftObject);
+            // System.out.print("right: " + rightObject);
+            if (rightObject == null) {
+               iterator.remove();
+            } else if (!leftObject.equals(rightObject)) {
+               iterator.set(rightObject);
             }
-            for (int i = 0; i < tmpObjects.size(); i++) {
-               generatedFigure.objects.add(tmpObjects.get(i));
-               System.out.print("adding generated object: " + tmpObjects.get(i));
-            }
-         } else {
-            System.out.println("am i here???");
          }
       }
-      System.out.print("generated: " + generatedFigure);
+      System.out.print("Generated : " + generatedFigure);
       return generatedFigure;
    }
 
-   boolean isIdentical(MyFigure rhs) {
-      for (int i = 0; i < objects.size(); i++) {
-         if (!objects.get(i).isIdentical(rhs.objects.get(i))) {
-            return false;
+   Map<MyObject, MyObject> transform(List<MyObject> firstObjects, List<MyObject> secondObjects) {
+      Map<MyObject, MyObject> firstToSecond = new HashMap<>();
+      int firstIndex = -1;
+      int secondIndex = -1;
+      boolean foundFirstMatch = false;
+      // look for a first match between an Object in the first list and another Object in the second
+      for (int i = 0; i < firstObjects.size(); i++) {
+         MyObject firstObject = firstObjects.get(i);
+         for (int j = 0; j < secondObjects.size(); j++) {
+            MyObject secondObject = secondObjects.get(j);
+            if (firstObject.match(secondObject)) {
+               firstToSecond.put(firstObject, secondObject);
+               firstIndex = i;
+               secondIndex = j;
+               foundFirstMatch = true;
+               break;
+            }
+         }
+         if (foundFirstMatch) {
+            break;
          }
       }
-      return true;
+
+      if (foundFirstMatch) {
+         // map the matches down the child path
+         for (int i = firstIndex + 1, j = secondIndex + 1; i < firstObjects.size() && j < secondObjects.size(); i++, j++) {
+            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
+         }
+         // map the matches up the parent path
+         for (int i = firstIndex - 1, j = secondIndex - 1; i >= 0 && j >= 0; i--, j--) {
+            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
+         }
+      }
+
+      return firstToSecond;
+   }
+
+   Map<MyObject, MyObject> transform(Map<MyObject, MyObject> map, List<MyObject> firstObjects, List<MyObject> secondObjects) {
+      Map<MyObject, MyObject> firstToSecond = new HashMap<>();
+      int secondIndex = -1;
+      MyObject firstObject = null;
+      for (MyObject mapValue : map.values()) {
+         for (int i = 0; i < secondObjects.size(); i++) {
+            MyObject secondObject = secondObjects.get(i);
+            if (mapValue.match(secondObject)) {
+               firstObject = mapValue;
+               firstToSecond.put(firstObject, secondObject);
+               secondIndex = i;
+               break;
+            }
+         }
+         if (firstObject != null) {
+            break;
+         }
+      }
+
+      if (firstObject != null) {
+         // reverse look up the first index based on the sole object in the map
+         int firstIndex = find(firstObjects, firstObject);
+         // map the matches down the child path
+         for (int i = firstIndex+1, j = secondIndex+1; i < firstObjects.size() && j < secondObjects.size(); i++, j++) {
+            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
+         }
+         // map the matches up the parent path
+         for (int i = firstIndex-1, j = secondIndex-1; i >= 0 && j >= 0; i--, j--) {
+            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
+         }
+      }
+
+      return firstToSecond;
    }
 
    int find(List<MyObject> list, MyObject target) {
       for (int i = 0; i < list.size(); i++) {
          MyObject object = list.get(i);
-         if (object.match(target)) {
-            System.out.print("Figure-find " + i + ": " + object);
+         // object could be null???
+         if (object != null && object.equals(target)) {
+            // System.out.print("Figure-find " + i + ": " + object);
             return i;
          }
       }
@@ -194,9 +200,34 @@ public class MyFigure {
    }
 
    @Override
+   public boolean equals(Object obj) {
+      MyFigure rightFigure = (MyFigure)obj;
+      if (this.objects.size() != rightFigure.objects.size())
+         return false;
+
+      for (int i = 0; i < this.objects.size(); i++) {
+         if (!this.objects.get(i).equals(rightFigure.objects.get(i))) {
+            return false;
+         }
+      }
+      return true;
+   }
+
+   @Override
+   public int hashCode() {
+      int result = 17;
+      for (MyObject object : objects) {
+         result = 31*result + object.hashCode();
+      }
+      return result;
+   }
+
+   @Override
    public String toString() {
       StringBuilder builder = new StringBuilder();
-      builder.append("Figure<name:").append(name).append("\n");
+      builder.append("Figure<name:").append(name);
+      builder.append(", ").append(objects.size()).append(" objects:");
+      builder.append("\n");
       for (MyObject object : objects) {
          builder.append(object);
       }

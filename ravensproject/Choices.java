@@ -27,7 +27,9 @@ public class Choices {
 
    int find(MyFigure target) {
       for (int i = 0; i < list.size(); i++) {
-         if (target.isIdentical(list.get(i))) {
+         // System.out.print("Target: " + target);
+         // System.out.print("Current: " + list.get(i));
+         if (target.equals(list.get(i))) {
             System.out.print("Choice " + i + ": " + list.get(i));
             return i;
          }
