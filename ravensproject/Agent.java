@@ -48,9 +48,9 @@ public class Agent {
         MyFigure figureA = patterns.get(0);
         MyFigure figureB = patterns.get(1);
         MyFigure figureC = patterns.get(2);
-        System.out.println(figureA);
-        System.out.println(figureB);
-        System.out.println(figureC);
+        // System.out.println(figureA);
+        // System.out.println(figureB);
+        // System.out.println(figureC);
 
         MyFigure horizontalTarget = figureC.generate(figureA, figureB);
         int horizontalChoice = problem.choices.find(horizontalTarget);

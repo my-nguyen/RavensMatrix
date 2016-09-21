@@ -1,6 +1,7 @@
 package ravensproject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -204,15 +205,26 @@ public class Attributes {
                int thisInt = Integer.parseInt(thisValue);
                int leftInt = Integer.parseInt(leftValue);
                int rightInt = Integer.parseInt(rightValue);
-               int diffInt = rightInt - leftInt;
+
                int generatedInt;
-               if (map.containsKey("shape") && map.get("shape") == "pac-man") {
-                  if (diffInt >= 270 && diffInt < 360) {
-                     generatedInt = diffInt - 90;
+               if (map.containsKey("shape") && map.get("shape").equals("pac-man")) {
+                  int[] list = new int[3];
+                  list[0] = thisInt;
+                  list[1] = leftInt;
+                  list[2] = rightInt;
+                  Arrays.sort(list);
+
+                  if (list[0] > 90) {
+                     generatedInt = list[0] - 90;
                   } else {
-                     generatedInt = diffInt + 90;
+                     if (list[1] - list[0] > 90) {
+                        generatedInt = list[0] + 90;
+                     } else {
+                        generatedInt = list[1] + 90;
+                     }
                   }
                } else {
+                  int diffInt = rightInt - leftInt;
                   generatedInt = thisInt + diffInt;
                }
                generatedValue = Integer.toString(generatedInt);
@@ -287,7 +299,11 @@ public class Attributes {
       if (map.containsKey("angle") && rhs.map.containsKey("angle")) {
          equalAngle = map.get("angle").equals(rhs.map.get("angle"));
       }
-      return match(rhs) && equalAngle;
+      boolean equalAlignment = true;
+      if (map.containsKey("alignment") && rhs.map.containsKey("alignment")) {
+         equalAlignment = map.get("alignment").equals(rhs.map.get("alignment"));
+      }
+      return match(rhs) && equalAngle && equalAlignment;
    }
 
    @Override

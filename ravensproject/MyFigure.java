@@ -12,6 +12,7 @@ import java.util.Map;
 public class MyFigure {
    String name;
    List<MyObject> objects;
+   boolean containsInside = false;
 
    MyFigure(RavensFigure figure) {
       name = figure.getName();
@@ -23,7 +24,6 @@ public class MyFigure {
          tmp.add(object);
       }
 
-      boolean containsInside = false;
       // can I iterate over the tmp List instead of the map?
       for (RavensObject value : figure.getObjects().values()) {
          // check if any RavensObject contains the attribute "inside"
@@ -84,33 +84,45 @@ public class MyFigure {
       // need to generate "inside" attribute also
    }
 
+   MyFigure(String name) {
+      this.name = name;
+      this.objects = new ArrayList<>();
+   }
+
    MyFigure generate(MyFigure leftFigure, MyFigure rightFigure) {
-      MyFigure generatedFigure = new MyFigure(this, "generated");
-      // System.out.print("copied figure: " + generatedFigure);
+      MyFigure generatedFigure;
+      if (!containsInside) {
+         generatedFigure = new MyFigure("generated");
+         for (int i = 0; i < objects.size(); i++) {
+            MyObject thisObject = this.objects.get(i);
+            MyObject leftObject = leftFigure.objects.get(i);
+            MyObject rightObject = rightFigure.objects.get(i);
+            MyObject generatedObject = thisObject.generate(leftObject, rightObject);
+            generatedFigure.objects.add(generatedObject);
+         }
+      } else {
+         generatedFigure = new MyFigure(this, "generated");
 
-      Map<MyObject, MyObject> generatedToLeft = transform(generatedFigure.objects, leftFigure.objects);
-      Map<MyObject, MyObject> leftToRight = transform(generatedToLeft, leftFigure.objects, rightFigure.objects);
-      // System.out.println("generatedToLeft size: " + generatedToLeft.size());
-      // System.out.println("leftToRight size: " + leftToRight.size());
+         Map<MyObject, MyObject> generatedToLeft = transform(generatedFigure.objects, leftFigure.objects);
+         Map<MyObject, MyObject> leftToRight = transform(generatedToLeft, leftFigure.objects, rightFigure.objects);
+         // System.out.println("generatedToLeft size: " + generatedToLeft.size());
+         // System.out.println("leftToRight size: " + leftToRight.size());
 
-      // for (int i = 0; i < generatedFigure.objects.size(); i++) {
-      ListIterator iterator = generatedFigure.objects.listIterator();
-      while (iterator.hasNext()) {
-         MyObject generatedObject = (MyObject)iterator.next();
-         // System.out.print("generated: " + generatedObject);
-         MyObject leftObject = generatedToLeft.get(generatedObject);
-         // System.out.print("left: " + leftObject);
-         if (leftObject != null) {
-            MyObject rightObject = leftToRight.get(leftObject);
-            // System.out.print("right: " + rightObject);
-            if (rightObject == null) {
-               iterator.remove();
-            } else if (!leftObject.equals(rightObject)) {
-               iterator.set(rightObject);
+         ListIterator iterator = generatedFigure.objects.listIterator();
+         while (iterator.hasNext()) {
+            MyObject generatedObject = (MyObject) iterator.next();
+            MyObject leftObject = generatedToLeft.get(generatedObject);
+            if (leftObject != null) {
+               MyObject rightObject = leftToRight.get(leftObject);
+               if (rightObject == null) {
+                  iterator.remove();
+               } else if (!leftObject.equals(rightObject)) {
+                  iterator.set(rightObject);
+               }
             }
          }
       }
-      System.out.print("Generated : " + generatedFigure);
+      // System.out.print("Generated : " + generatedFigure);
       return generatedFigure;
    }
 
