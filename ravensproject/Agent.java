@@ -52,17 +52,13 @@ public class Agent {
         System.out.println(figureB);
         System.out.println(figureC);
 
-        MyFigure horizontalDiff = figureB.subtract(figureA);
-        System.out.println("A -> B:" + horizontalDiff);
-        MyFigure horizontalTarget = figureC.add(horizontalDiff);
-        System.out.println("C -> TARGET:" + horizontalTarget);
+        MyFigure horizontalTarget = figureC.generate(figureA, figureB);
         int horizontalChoice = problem.choices.find(horizontalTarget);
-
-        MyFigure verticalDiff = figureC.subtract(figureA);
-        System.out.println("A -> C:" + verticalDiff);
-        MyFigure verticalTarget = figureB.add(verticalDiff);
-        System.out.println("B -> TARGET:" + verticalTarget);
+        System.out.println("horizontal choice: " + horizontalChoice);
+        MyFigure verticalTarget = figureB.generate(figureA, figureC);
         int verticalChoice = problem.choices.find(verticalTarget);
+        System.out.println("vertical choice: " + verticalChoice);
+
         if (horizontalChoice == verticalChoice) {
             System.out.println("Answer: " + (horizontalChoice+1) + ": " + verticalTarget);
             return horizontalChoice;

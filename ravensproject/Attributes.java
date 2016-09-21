@@ -1,7 +1,6 @@
 package ravensproject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -17,6 +16,12 @@ public class Attributes {
 
    Attributes() {
       map = new LinkedHashMap<>();
+   }
+
+   Attributes(Attributes rhs) {
+      for (Map.Entry<String, String> entry : rhs.map.entrySet()) {
+         map.put(entry.getKey(), entry.getValue());
+      }
    }
 
    Attributes(Map<String, String> rhs) {
@@ -136,10 +141,10 @@ public class Attributes {
                // make up 4 possible attributes out of those 4 labels: "bottom-right", "bottom-left",
                // "top-right", "top-left"
                Map<String, Boolean> map = new HashMap<>();
-               for (String leftLabel : left) {
-                  for (String rightLabel : right) {
-                     String newLabel = leftLabel + "-" + rightLabel;
-                     map.put(newLabel, true);
+               for (String leftPosition : left) {
+                  for (String rightPosition : right) {
+                     String newPosition = leftPosition + "-" + rightPosition;
+                     map.put(newPosition, true);
                   }
                }
 
@@ -172,11 +177,94 @@ public class Attributes {
                } else {
                   value = rhs.map.get("size");
                }
+            } else {
+               System.out.println("unprocessed attribute: (" + key + ", " + entry.getValue());
             }
             attributes.map.put(key, value);
          }
       }
       return attributes;
+   }
+
+   Attributes generate(Attributes left, Attributes right) {
+      Attributes generatedAttributes = new Attributes();
+      for (Map.Entry<String, String> entry : map.entrySet()) {
+         String key = entry.getKey();
+         if (!left.map.containsKey(key)) {
+         } else if (!right.map.containsKey(key)) {
+         } else if (key.equals("inside")) {
+         } else {
+            String thisValue = this.map.get(key);
+            String leftValue = left.map.get(key);
+            String rightValue = right.map.get(key);
+            String generatedValue = "";
+
+            if (key.equals("angle")) {
+               int thisInt = Integer.parseInt(thisValue);
+               int leftInt = Integer.parseInt(leftValue);
+               int rightInt = Integer.parseInt(rightValue);
+               int diffInt = rightInt - leftInt;
+               int generatedInt;
+               if (map.containsKey("shape") && map.get("shape") == "pac-man") {
+                  if (diffInt >= 270 && diffInt < 360) {
+                     generatedInt = diffInt - 90;
+                  } else {
+                     generatedInt = diffInt + 90;
+                  }
+               } else {
+                  generatedInt = thisInt + diffInt;
+               }
+               generatedValue = Integer.toString(generatedInt);
+            } else if (key.equals("alignment")) {
+               // save the current 3 alignments "bottom-right", "bottom-left" and "top-right"
+               List<String> allAlignments = new ArrayList<>();
+               allAlignments.add(thisValue);
+               allAlignments.add(leftValue);
+               allAlignments.add(rightValue);
+
+               // break those 3 alignment attributes into 2 sets of 2 positions each:
+               // {"bottom", "top"} and {"right", "left"}
+               Set<String> leftPositions = new HashSet<>();
+               Set<String> rightPositions = new HashSet<>();
+               for (String alignment : allAlignments) {
+                  String[] positions = alignment.split("-");
+                  leftPositions.add(positions[0]);
+                  rightPositions.add(positions[1]);
+               }
+
+               // make up 4 possible attributes out of those 4 labels: "bottom-right", "bottom-left",
+               // "top-right", "top-left"
+               Map<String, Boolean> allPositions = new HashMap<>();
+               for (String leftPosition : leftPositions) {
+                  for (String rightPosition : rightPositions) {
+                     String combinedPosition = leftPosition + "-" + rightPosition;
+                     allPositions.put(combinedPosition, true);
+                  }
+               }
+
+               // mark the 3 existing attributes "bottom-right", "bottom-left" and "top-right"
+               for (String alignment : allAlignments) {
+                  allPositions.put(alignment, false);
+               }
+               // look for the 1 missing attribute, which should be "top-left"
+               for (Map.Entry<String, Boolean> position : allPositions.entrySet()) {
+                  if (position.getValue()) {
+                     generatedValue = position.getKey();
+                     break;
+                  }
+               }
+            } else if (key.equals("size") || key.equals("shape") || key.equals("fill")) {
+               if (leftValue.equals(rightValue)) {
+                  generatedValue = thisValue;
+               } else {
+                  generatedValue = rightValue;
+               }
+            }
+
+            generatedAttributes.map.put(key, generatedValue);
+         }
+      }
+      return generatedAttributes;
    }
 
    boolean isIdentical(Attributes rhs) {

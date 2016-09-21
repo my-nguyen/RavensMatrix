@@ -26,11 +26,9 @@ public class Choices {
    }
 
    int find(MyFigure target) {
-      // System.out.println("Choices size: " + list.size());
       for (int i = 0; i < list.size(); i++) {
-         // System.out.println("Item " + i + " " + list.get(i));
          if (target.isIdentical(list.get(i))) {
-            System.out.println("CHOICE " + i + ": " + list.get(i));
+            System.out.print("Choice " + i + ": " + list.get(i));
             return i;
          }
       }
