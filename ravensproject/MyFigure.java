@@ -78,7 +78,7 @@ public class MyFigure {
       this.name = name;
       this.objects = new ArrayList<>();
       for (MyObject rightObject : rightFigure.objects) {
-         MyObject thisObject = new MyObject(rightObject, "generated");
+         MyObject thisObject = new MyObject("generated", rightObject.attributes);
          this.objects.add(thisObject);
       }
       // need to generate "inside" attribute also
@@ -89,9 +89,61 @@ public class MyFigure {
       this.objects = new ArrayList<>();
    }
 
+   class Pair {
+      int left;
+      int right;
+      Pair(int lhs, int rhs) {
+         left = lhs;
+         right = rhs;
+      }
+   }
+
    MyFigure generate(MyFigure leftFigure, MyFigure rightFigure) {
       MyFigure generatedFigure;
-      if (!containsInside) {
+      if (containsInside) {
+         // copy all MyObjects from this figure to the generated figure
+         generatedFigure = new MyFigure(this, "generated");
+         Pair pair = firstMatch(generatedFigure.objects, leftFigure.objects);
+         Map<MyObject, MyObject> generatedToLeft = null;
+         if (pair != null) {
+            // map all matching objects from generatedFigure to leftFigure
+            generatedToLeft = map(pair, generatedFigure.objects, leftFigure.objects);
+            Pair indices = firstMatch(generatedToLeft, leftFigure.objects, rightFigure.objects);
+            if (indices != null) {
+               Map<MyObject, MyObject> leftToRight = null;
+               // map all such matching objects from leftFigure to rightFigure
+               leftToRight = map(indices, leftFigure.objects, rightFigure.objects);
+
+               // collect all objects in rightFigure that map to those in leftFigure
+               ListIterator iterator = generatedFigure.objects.listIterator();
+               while (iterator.hasNext()) {
+                  MyObject generatedObject = (MyObject) iterator.next();
+                  MyObject leftObject = generatedToLeft.get(generatedObject);
+                  // only process those objects that exist in the generatedToLeft map
+                  if (leftObject != null) {
+                     // map an object in generatedFigure to an object in rightFigure
+                     MyObject rightObject = leftToRight.get(leftObject);
+                     if (rightObject == null) {
+                        // remove object from generatedFigure if there's no mapping to rightFigure
+                        iterator.remove();
+                     } else if (!leftObject.equals(rightObject)) {
+                        // replace object in generatedFigure if there's a mapping to rightFigure
+                        iterator.set(rightObject);
+                     }
+                  }
+               }
+
+               // collect all objects in rightFigure that don't map to those in leftFigure
+               Map<Integer, Boolean> map = match(indices, leftFigure.objects, rightFigure.objects);
+               for (int i = 0; i < rightFigure.objects.size(); i++) {
+                  if (!map.containsKey(i)) {
+                     MyObject object = new MyObject(rightFigure.objects.get(i));
+                     generatedFigure.objects.add(object);
+                  }
+               }
+            }
+         }
+      } else {
          generatedFigure = new MyFigure("generated");
          for (int i = 0; i < objects.size(); i++) {
             MyObject thisObject = this.objects.get(i);
@@ -100,100 +152,70 @@ public class MyFigure {
             MyObject generatedObject = thisObject.generate(leftObject, rightObject);
             generatedFigure.objects.add(generatedObject);
          }
-      } else {
-         generatedFigure = new MyFigure(this, "generated");
-
-         Map<MyObject, MyObject> generatedToLeft = transform(generatedFigure.objects, leftFigure.objects);
-         Map<MyObject, MyObject> leftToRight = transform(generatedToLeft, leftFigure.objects, rightFigure.objects);
-
-         ListIterator iterator = generatedFigure.objects.listIterator();
-         while (iterator.hasNext()) {
-            MyObject generatedObject = (MyObject) iterator.next();
-            MyObject leftObject = generatedToLeft.get(generatedObject);
-            if (leftObject != null) {
-               MyObject rightObject = leftToRight.get(leftObject);
-               if (rightObject == null) {
-                  iterator.remove();
-               } else if (!leftObject.equals(rightObject)) {
-                  iterator.set(rightObject);
-               }
-            }
-         }
       }
       // System.out.print("Generated : " + generatedFigure);
       return generatedFigure;
    }
 
-   Map<MyObject, MyObject> transform(List<MyObject> firstObjects, List<MyObject> secondObjects) {
-      Map<MyObject, MyObject> firstToSecond = new HashMap<>();
-      int firstIndex = -1;
-      int secondIndex = -1;
-      boolean foundFirstMatch = false;
+   Pair firstMatch(List<MyObject> firstObjects, List<MyObject> secondObjects) {
       // look for a first match between an Object in the first list and another Object in the second
       for (int i = 0; i < firstObjects.size(); i++) {
          MyObject firstObject = firstObjects.get(i);
          for (int j = 0; j < secondObjects.size(); j++) {
             MyObject secondObject = secondObjects.get(j);
             if (firstObject.match(secondObject)) {
-               firstToSecond.put(firstObject, secondObject);
-               firstIndex = i;
-               secondIndex = j;
-               foundFirstMatch = true;
-               break;
+               return new Pair(i, j);
             }
          }
-         if (foundFirstMatch) {
-            break;
-         }
       }
+      return null;
+   }
 
-      if (foundFirstMatch) {
-         // map the matches down the child path
-         for (int i = firstIndex + 1, j = secondIndex + 1; i < firstObjects.size() && j < secondObjects.size(); i++, j++) {
-            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
-         }
-         // map the matches up the parent path
-         for (int i = firstIndex - 1, j = secondIndex - 1; i >= 0 && j >= 0; i--, j--) {
-            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
-         }
+   Map<MyObject, MyObject> map(Pair indices, List<MyObject> firstObjects, List<MyObject> secondObjects) {
+      Map<MyObject, MyObject> firstToSecond = new HashMap<>();
+      firstToSecond.put(firstObjects.get(indices.left), secondObjects.get(indices.right));
+
+      // map the matches down the child path
+      for (int i = indices.left + 1, j = indices.right + 1; i < firstObjects.size() && j < secondObjects.size(); i++, j++) {
+         firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
+      }
+      // map the matches up the parent path
+      for (int i = indices.left - 1, j = indices.right - 1; i >= 0 && j >= 0; i--, j--) {
+         firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
       }
 
       return firstToSecond;
    }
 
-   Map<MyObject, MyObject> transform(Map<MyObject, MyObject> map, List<MyObject> firstObjects, List<MyObject> secondObjects) {
-      Map<MyObject, MyObject> firstToSecond = new HashMap<>();
-      int secondIndex = -1;
-      MyObject firstObject = null;
-      for (MyObject mapValue : map.values()) {
+   Map<Integer, Boolean> match(Pair indices, List<MyObject> firstObjects, List<MyObject> secondObjects) {
+      Map<Integer, Boolean> map = new HashMap<>();
+      map.put(indices.right, true);
+
+      // map the matches down the child path
+      for (int i = indices.left + 1, j = indices.right + 1; i < firstObjects.size() && j < secondObjects.size(); i++, j++) {
+         map.put(j, true);
+      }
+      // map the matches up the parent path
+      for (int i = indices.left - 1, j = indices.right - 1; i >= 0 && j >= 0; i--, j--) {
+         map.put(j, true);
+      }
+
+      return map;
+   }
+
+   Pair firstMatch(Map<MyObject, MyObject> generatedToLeft, List<MyObject> firstObjects, List<MyObject> secondObjects) {
+      for (MyObject mapValue : generatedToLeft.values()) {
          for (int i = 0; i < secondObjects.size(); i++) {
             MyObject secondObject = secondObjects.get(i);
             if (mapValue.match(secondObject)) {
-               firstObject = mapValue;
-               firstToSecond.put(firstObject, secondObject);
-               secondIndex = i;
-               break;
+               // reverse look up the first index based on the sole object in the map
+               int firstIndex = find(firstObjects, mapValue);
+               int secondIndex = i;
+               return new Pair(firstIndex, secondIndex);
             }
          }
-         if (firstObject != null) {
-            break;
-         }
       }
-
-      if (firstObject != null) {
-         // reverse look up the first index based on the sole object in the map
-         int firstIndex = find(firstObjects, firstObject);
-         // map the matches down the child path
-         for (int i = firstIndex+1, j = secondIndex+1; i < firstObjects.size() && j < secondObjects.size(); i++, j++) {
-            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
-         }
-         // map the matches up the parent path
-         for (int i = firstIndex-1, j = secondIndex-1; i >= 0 && j >= 0; i--, j--) {
-            firstToSecond.put(firstObjects.get(i), secondObjects.get(j));
-         }
-      }
-
-      return firstToSecond;
+      return null;
    }
 
    int find(List<MyObject> list, MyObject target) {

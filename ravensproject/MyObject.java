@@ -8,19 +8,22 @@ public class MyObject {
    Attributes attributes;
    MyObject above;
 
-   MyObject(MyObject object, String name) {
-      this.name = name;
-      this.attributes = new Attributes(object.attributes);
-   }
-
    MyObject(RavensObject object) {
-      name = object.getName();
-      attributes = new Attributes(object.getAttributes());
+      this.name = object.getName();
+      this.attributes = new Attributes(object.getAttributes());
    }
 
    MyObject(String name, Attributes attributes) {
+      init(name, attributes);
+   }
+
+   MyObject(MyObject rhs) {
+      init(rhs.name, rhs.attributes);
+   }
+
+   void init(String name, Attributes attributes) {
       this.name = name;
-      this.attributes = attributes;
+      this.attributes = new Attributes(attributes);
    }
 
    MyObject generate(MyObject left, MyObject right) {

@@ -54,10 +54,9 @@ public class Agent {
         MyFigure horizontalTarget = figureC.generate(figureA, figureB);
         int horizontalChoice = problem.choices.find(horizontalTarget) + 1;
         System.out.println("horizontal choice: " + horizontalChoice);
-        return horizontalChoice;
-        /*
+
         MyFigure verticalTarget = figureB.generate(figureA, figureC);
-        int verticalChoice = problem.choices.find(verticalTarget);
+        int verticalChoice = problem.choices.find(verticalTarget) + 1;
         System.out.println("vertical choice: " + verticalChoice);
 
         if (horizontalChoice == verticalChoice) {
@@ -66,6 +65,5 @@ public class Agent {
         } else {
             return -1;
         }
-        */
     }
 }
