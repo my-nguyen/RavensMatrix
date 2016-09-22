@@ -105,8 +105,6 @@ public class MyFigure {
 
          Map<MyObject, MyObject> generatedToLeft = transform(generatedFigure.objects, leftFigure.objects);
          Map<MyObject, MyObject> leftToRight = transform(generatedToLeft, leftFigure.objects, rightFigure.objects);
-         // System.out.println("generatedToLeft size: " + generatedToLeft.size());
-         // System.out.println("leftToRight size: " + leftToRight.size());
 
          ListIterator iterator = generatedFigure.objects.listIterator();
          while (iterator.hasNext()) {
@@ -202,7 +200,7 @@ public class MyFigure {
       for (int i = 0; i < list.size(); i++) {
          MyObject object = list.get(i);
          // object could be null???
-         if (object != null && object.equals(target)) {
+         if (object.equals(target)) {
             // System.out.print("Figure-find " + i + ": " + object);
             return i;
          }

@@ -12,6 +12,7 @@ public class MyObject {
       this.name = name;
       this.attributes = new Attributes(object.attributes);
    }
+
    MyObject(RavensObject object) {
       name = object.getName();
       attributes = new Attributes(object.getAttributes());
@@ -28,19 +29,18 @@ public class MyObject {
    }
 
    int index() {
-      String inside = attributes.map.get("inside");
+      String inside = attributes.get("inside");
       int result = (inside == null ? 0 : inside.split(",").length);
       return result;
    }
 
-   // match() differs from equals() in that match() skips comparing the angle attribute
    boolean match(MyObject rhs) {
       return attributes.match(rhs.attributes);
    }
 
    @Override
    public boolean equals(Object obj) {
-      return obj != null && attributes.equals(((MyObject)obj).attributes);
+      return attributes.equals(((MyObject)obj).attributes);
    }
 
    @Override

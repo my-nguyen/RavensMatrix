@@ -43,7 +43,6 @@ public class Agent {
         MyProblem problem = new MyProblem(probleme);
         System.out.println(problem);
 
-        // if Figure A to Figure B is UNCHANGED
         List<MyFigure> patterns = problem.patterns.list;
         MyFigure figureA = patterns.get(0);
         MyFigure figureB = patterns.get(1);
@@ -53,8 +52,8 @@ public class Agent {
         // System.out.println(figureC);
 
         MyFigure horizontalTarget = figureC.generate(figureA, figureB);
-        int horizontalChoice = problem.choices.find(horizontalTarget);
-        System.out.println("horizontal choice: " + (horizontalChoice+1));
+        int horizontalChoice = problem.choices.find(horizontalTarget) + 1;
+        System.out.println("horizontal choice: " + horizontalChoice);
         return horizontalChoice;
         /*
         MyFigure verticalTarget = figureB.generate(figureA, figureC);
