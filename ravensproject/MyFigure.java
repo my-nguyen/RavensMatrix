@@ -15,7 +15,7 @@ public class MyFigure {
    boolean containsInside = false;
 
    MyFigure(RavensFigure figure) {
-      name = figure.getName();
+      init(figure.getName());
 
       // construct a temporary List<MyObject> based on the RavensFigure.HashMap<String, RavensObject>
       List<MyObject> tmp = new ArrayList<>();
@@ -44,7 +44,6 @@ public class MyFigure {
             indices.put(index, object);
          }
          // insert the MyObjects from the temporary map into objects based on the calculated indices
-         objects = new ArrayList<>();
          for (int i = 0; i < indices.size(); i++) {
             objects.add(indices.get(i));
          }
@@ -74,9 +73,8 @@ public class MyFigure {
       }
    }
 
-   MyFigure(MyFigure rightFigure, String name) {
-      this.name = name;
-      this.objects = new ArrayList<>();
+   MyFigure(String name, MyFigure rightFigure) {
+      init(name);
       for (MyObject rightObject : rightFigure.objects) {
          MyObject thisObject = new MyObject("generated", rightObject.attributes);
          this.objects.add(thisObject);
@@ -85,6 +83,10 @@ public class MyFigure {
    }
 
    MyFigure(String name) {
+      init(name);
+   }
+
+   void init(String name) {
       this.name = name;
       this.objects = new ArrayList<>();
    }
@@ -102,7 +104,7 @@ public class MyFigure {
       MyFigure generatedFigure;
       if (containsInside) {
          // copy all MyObjects from this figure to the generated figure
-         generatedFigure = new MyFigure(this, "generated");
+         generatedFigure = new MyFigure("generated", this);
          Pair pair = firstMatch(generatedFigure.objects, leftFigure.objects);
          Map<MyObject, MyObject> generatedToLeft = null;
          if (pair != null) {

@@ -27,13 +27,15 @@ public class MyObject {
    }
 
    MyObject generate(MyObject left, MyObject right) {
-      MyObject object = new MyObject("generated", this.attributes.generate(left.attributes, right.attributes));
-      return object;
+      return new MyObject("generated", this.attributes.generate(left.attributes, right.attributes));
    }
 
    int index() {
+      int result = 0;
       String inside = attributes.get("inside");
-      int result = (inside == null ? 0 : inside.split(",").length);
+      if (inside != null) {
+         result = inside.split(",").length;
+      }
       return result;
    }
 

@@ -60,7 +60,7 @@ public class Agent {
         System.out.println("vertical choice: " + verticalChoice);
 
         if (horizontalChoice == verticalChoice) {
-            System.out.println("Answer: " + (horizontalChoice+1) + ": " + verticalTarget);
+            System.out.println(verticalTarget);
             return horizontalChoice;
         } else {
             return -1;

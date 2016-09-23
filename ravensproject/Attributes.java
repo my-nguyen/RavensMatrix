@@ -42,7 +42,7 @@ public class Attributes extends HashMap<String, String> {
             String thisValue = this.get(key);
             String leftValue = left.get(key);
             String rightValue = right.get(key);
-            String generatedValue = "";
+            String generatedValue = null;
 
             if (key.equals("angle")) {
                int thisInt = Integer.parseInt(thisValue);
@@ -115,6 +115,8 @@ public class Attributes extends HashMap<String, String> {
                } else {
                   generatedValue = rightValue;
                }
+            } else if (key.equals("above")) {
+               generatedValue = "";
             }
 
             generatedAttributes.put(key, generatedValue);
